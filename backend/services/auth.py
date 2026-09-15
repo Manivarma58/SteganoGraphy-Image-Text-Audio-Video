@@ -3,9 +3,13 @@ import hashlib
 import hmac
 import json
 import secrets
-import pymongo
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
+
+try:
+    import pymongo
+except Exception:  # pragma: no cover - optional in some deployment environments
+    pymongo = None
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer

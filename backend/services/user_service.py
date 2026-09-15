@@ -1,8 +1,13 @@
 import uuid
 from datetime import datetime, timezone
 from typing import Optional
-import pymongo
-from pymongo.errors import DuplicateKeyError
+
+try:
+    import pymongo
+    from pymongo.errors import DuplicateKeyError
+except Exception:  # pragma: no cover - optional in some deployment environments
+    pymongo = None
+    DuplicateKeyError = ValueError
 
 from backend.security.password import hash_password
 from backend.services.db import users_col

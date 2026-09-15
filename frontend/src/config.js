@@ -1,4 +1,8 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000/api";
+const localFallbackApiBase = typeof window !== "undefined"
+  ? `${window.location.protocol}//${window.location.hostname}:8000/api`
+  : "http://localhost:8000/api";
+
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? localFallbackApiBase;
 
 export const FILE_LIMITS = {
   image: 100 * 1024 * 1024,

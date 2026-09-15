@@ -1,18 +1,32 @@
-import pymongo
-import gridfs
-from bson.objectid import ObjectId
+import os
+
+try:
+    import gridfs
+    import pymongo
+    from bson.objectid import ObjectId
+except Exception:  # pragma: no cover - depends on deployment environment
+    gridfs = None
+    pymongo = None
+    ObjectId = None
+
 from backend.services.config import settings
 
 # MongoDB connection configuration
-MONGO_URI = "mongodb://localhost:27017"
-DB_NAME = "stego_vault"
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
+DB_NAME = os.getenv("DB_NAME", "stego_vault")
 
-client = pymongo.MongoClient(MONGO_URI)
-db = client[DB_NAME]
-
-users_col = db["users"]
-jobs_col = db["jobs"]
-fs = gridfs.GridFS(db)
+if pymongo is not None:
+    client = pymongo.MongoClient(MONGO_URI)
+    db = client[DB_NAME]
+    users_col = db["users"]
+    jobs_col = db["jobs"]
+    fs = gridfs.GridFS(db)
+else:
+    client = None
+    db = None
+    users_col = None
+    jobs_col = None
+    fs = None
 
 # Indexes will be initialized in initialize_database() to prevent startup/import crashes
 
