@@ -1,0 +1,33 @@
+# Web framework
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+starlette==0.47.3
+python-multipart==0.0.20
+
+# Data validation
+pydantic==2.11.7
+pydantic-settings>=2.0.0
+
+# Database
+pymongo==4.17.0
+python-dotenv==1.2.2
+
+# Task queue
+celery==5.5.3
+redis==6.4.0
+
+# ML / Image processing
+torch==2.9.1+cpu
+torchvision==0.24.1+cpu
+opencv-python-headless==5.0.0.93
+Pillow==11.3.0
+numpy==2.3.2
+
+# Auth / Security
+cryptography==45.0.6
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+
+# Utilities
+python-dateutil==2.9.0.post0
+PyYAML==6.0.3
