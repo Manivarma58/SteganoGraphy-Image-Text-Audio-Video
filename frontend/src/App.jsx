@@ -121,17 +121,6 @@ export default function App() {
     };
   }, []);
 
-  // Synchronize document background color with active view to eliminate any white margins on zoom/resize
-  useEffect(() => {
-    if (!currentUser && activeView !== "landing") {
-      document.documentElement.style.backgroundColor = "#090d16";
-      document.body.style.backgroundColor = "#090d16";
-    } else {
-      document.documentElement.style.backgroundColor = "";
-      document.body.style.backgroundColor = "";
-    }
-  }, [currentUser, activeView]);
-
   // Listen for browser Back/Forward navigation popstate events
   useEffect(() => {
     const handlePopState = () => {
@@ -311,6 +300,17 @@ export default function App() {
       (act.status || "").toLowerCase().includes(term)
     );
   });
+
+  // Synchronize document background color with active view to eliminate any white margins on zoom/resize
+  useEffect(() => {
+    if (!currentUser && activeView !== "landing") {
+      document.documentElement.style.backgroundColor = "#090d16";
+      document.body.style.backgroundColor = "#090d16";
+    } else {
+      document.documentElement.style.backgroundColor = "";
+      document.body.style.backgroundColor = "";
+    }
+  }, [currentUser, activeView]);
 
   // Load activity from localStorage and check backend health on mount
   useEffect(() => {
