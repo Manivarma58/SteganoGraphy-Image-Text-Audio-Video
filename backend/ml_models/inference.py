@@ -1,15 +1,26 @@
+from __future__ import annotations
+
+import os
 from io import BytesIO
+from typing import TYPE_CHECKING
 
 import numpy as np
 from PIL import Image
 
+if TYPE_CHECKING:
+    import torch as _torch  # only for type checker, never at runtime
+
 try:
     import torch
 except Exception as exc:  # pragma: no cover - exercised when torch is unavailable
-    torch = None
-    _torch_error = exc
+    torch = None  # type: ignore[assignment]
+    _torch_error: Exception | None = exc
 else:
     _torch_error = None
+    # Maximize CPU performance — use all available cores
+    _cpu_cores = os.cpu_count() or 2
+    torch.set_num_threads(_cpu_cores)
+    torch.set_num_interop_threads(max(1, _cpu_cores // 2))
 
 
 class MultiModalInferenceService:
@@ -27,10 +38,10 @@ class MultiModalInferenceService:
 
         from backend.ml_models.models import AutoStegaLLM, DWTSwinTransformer, MultiscaleAttentionCNN, TwoStageDepthBalancedGAN
 
-        self.image_model = TwoStageDepthBalancedGAN().eval()
-        self.audio_model = DWTSwinTransformer().eval()
-        self.video_model = MultiscaleAttentionCNN().eval()
-        self.text_model = AutoStegaLLM().eval()
+        self.image_model = TwoStageDepthBalancedGAN().eval()  # type: ignore[union-attr]
+        self.audio_model = DWTSwinTransformer().eval()        # type: ignore[union-attr]
+        self.video_model = MultiscaleAttentionCNN().eval()    # type: ignore[union-attr]
+        self.text_model = AutoStegaLLM().eval()               # type: ignore[union-attr]
 
     async def encode(self, modality: str, cover_bytes: bytes, secret_bytes: bytes, runtime, embedding_type: str = "adaptive") -> bytes:
         import asyncio
@@ -52,17 +63,19 @@ class MultiModalInferenceService:
         raise ValueError(f"Unsupported modality: {modality}")
 
     def _encode_image(self, cover_bytes: bytes, device: str, mixed_precision: bool) -> bytes:
+        assert torch is not None, "torch must be available"
         image = Image.open(BytesIO(cover_bytes)).convert("RGB")
         tensor = torch.from_numpy(np.array(image)).float() / 255.0
         tensor = tensor.permute(2, 0, 1).unsqueeze(0).to(device)
-        self.image_model.to(device)
+        if self.image_model is not None:
+            self.image_model.to(device)  # type: ignore[operator]
 
         with torch.inference_mode():
             if mixed_precision and device == "cuda":
                 with torch.autocast(device_type="cuda", dtype=torch.float16):
-                    output = self.image_model(tensor)
+                    output = self.image_model(tensor)  # type: ignore[misc]
             else:
-                output = self.image_model(tensor)
+                output = self.image_model(tensor)  # type: ignore[misc]
 
         output_image = output.squeeze(0).permute(1, 2, 0).clamp(0, 1).mul(255).byte().cpu().numpy()
         buffer = BytesIO()
@@ -70,24 +83,30 @@ class MultiModalInferenceService:
         return buffer.getvalue()
 
     def _encode_audio(self, cover_bytes: bytes, device: str) -> bytes:
-        self.audio_model.to(device)
+        assert torch is not None, "torch must be available"
+        if self.audio_model is not None:
+            self.audio_model.to(device)  # type: ignore[operator]
         dummy_tensor = torch.randn(1, 1, 1024, device=device)
         with torch.inference_mode():
-            _ = self.audio_model(dummy_tensor)
+            _ = self.audio_model(dummy_tensor)  # type: ignore[misc]
         return cover_bytes
 
     def _encode_video(self, cover_bytes: bytes, device: str) -> bytes:
-        self.video_model.to(device)
+        assert torch is not None, "torch must be available"
+        if self.video_model is not None:
+            self.video_model.to(device)  # type: ignore[operator]
         dummy_tensor = torch.randn(1, 3, 2, 64, 64, device=device)
         with torch.inference_mode():
-            _ = self.video_model(dummy_tensor)
+            _ = self.video_model(dummy_tensor)  # type: ignore[misc]
         return cover_bytes
 
     def _encode_text(self, cover_bytes: bytes, device: str) -> bytes:
-        self.text_model.to(device)
+        assert torch is not None, "torch must be available"
+        if self.text_model is not None:
+            self.text_model.to(device)  # type: ignore[operator]
         dummy_tensor = torch.randn(1, 16, 64, device=device)
         with torch.inference_mode():
-            _ = self.text_model(dummy_tensor)
+            _ = self.text_model(dummy_tensor)  # type: ignore[misc]
         return cover_bytes
 
     def _pass_through_signal(self, content: bytes) -> bytes:
