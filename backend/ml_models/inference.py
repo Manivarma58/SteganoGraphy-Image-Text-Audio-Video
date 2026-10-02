@@ -25,7 +25,7 @@ class MultiModalInferenceService:
         if torch is None:
             return
 
-        from ml_models.models import AutoStegaLLM, DWTSwinTransformer, MultiscaleAttentionCNN, TwoStageDepthBalancedGAN
+        from backend.ml_models.models import AutoStegaLLM, DWTSwinTransformer, MultiscaleAttentionCNN, TwoStageDepthBalancedGAN
 
         self.image_model = TwoStageDepthBalancedGAN().eval()
         self.audio_model = DWTSwinTransformer().eval()

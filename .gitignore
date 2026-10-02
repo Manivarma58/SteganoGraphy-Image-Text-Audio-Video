@@ -1,15 +1,33 @@
+# ── Runtime data (MongoDB, uploads, outputs, secrets) ─────────────────────────
 backend/runtime/
 
-# Python cache
+# ── Python bytecode & cache ────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
 *$py.class
 *.pyo
 
-# Virtual environments
+# ── Virtual environments ───────────────────────────────────────────────────────
 .venv/
 venv/
 env/
 
-# Environment variables
+# ── Environment & secrets ──────────────────────────────────────────────────────
 .env
+*.key
+
+# ── Test / coverage artefacts ─────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ── Node / frontend ────────────────────────────────────────────────────────────
+node_modules/
+dist/
+build/
+
+# ── IDE / OS ───────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store

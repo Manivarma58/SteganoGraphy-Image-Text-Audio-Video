@@ -31,7 +31,7 @@ model_service = None
 def _get_model_service():
     global model_service
     if model_service is None:
-        from ml_models.inference import MultiModalInferenceService
+        from backend.ml_models.inference import MultiModalInferenceService
 
         model_service = MultiModalInferenceService()
     return model_service
